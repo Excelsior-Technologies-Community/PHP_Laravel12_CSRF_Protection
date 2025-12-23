@@ -1,59 +1,256 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PHP_Laravel12_CSRF_Protection
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A practical **Laravel 12** project demonstrating **Cross-Site Request Forgery (CSRF) protection** in real-world scenarios. This repository explains how CSRF works in Laravel using protected forms, unsafe forms, and AJAX-based submissions with proper token handling.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Project Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+This project is designed to help developers understand how Laravel protects applications against CSRF attacks. It includes multiple examples to clearly show what happens **with** and **without** CSRF protection.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The project is suitable for:
 
-## Learning Laravel
+* Laravel beginners
+* Interview preparation
+* Security concept demonstrations
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Key Features
 
-## Laravel Sponsors
+* CSRF-protected form using Blade directive
+* Unsafe form without CSRF token (demonstrates 419 error)
+* AJAX form submission with CSRF token handling
+* Server-side validation
+* Bootstrap 5 responsive UI
+* Clear logging of form submissions
+* Demonstration of CSRF middleware behavior
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## Prerequisites
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Ensure the following are installed:
 
-## Contributing
+* PHP 8.1 or higher
+* Composer
+* MySQL (optional)
+* Git
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Step-by-Step Setup
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Step 1: Create a New Laravel Project
 
-## Security Vulnerabilities
+```bash
+composer create-project laravel/laravel laravel-csrf-demo
+cd laravel-csrf-demo
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+### Step 2: Configure Database (Optional)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Edit the `.env` file:
+
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel_csrf
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+---
+
+### Step 3: Define Routes
+
+Edit `routes/web.php`:
+
+```php
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/form', [FormController::class, 'showForm'])->name('form.show');
+Route::post('/form', [FormController::class, 'submitForm'])->name('form.submit');
+
+Route::get('/form-unsafe', [FormController::class, 'showUnsafeForm'])->name('form.unsafe.show');
+Route::post('/form-unsafe', [FormController::class, 'submitUnsafeForm'])->name('form.unsafe.submit');
+
+Route::get('/ajax-form', [FormController::class, 'showAjaxForm'])->name('ajax.form.show');
+Route::post('/ajax-form', [FormController::class, 'submitAjaxForm'])->name('ajax.form.submit');
+```
+
+---
+
+### Step 4: Create Controller
+
+```bash
+php artisan make:controller FormController
+```
+
+The controller handles:
+
+* CSRF-protected form submission
+* Unsafe form submission
+* AJAX-based form submission
+
+---
+
+## Views Overview
+
+### Main Layout
+
+* Located at `resources/views/layouts/app.blade.php`
+* Includes Bootstrap 5
+* Contains CSRF token meta tag
+
+```
+<meta name="csrf-token" content="{{ csrf_token() }}">
+```
+
+---
+
+### Protected Form
+
+* Uses `@csrf` directive
+* Submission succeeds
+* Demonstrates Laravel token verification
+
+```
+<form method="POST">
+    @csrf
+</form>
+```
+
+---
+
+### Unsafe Form
+
+* No CSRF token
+* Submission fails with **419 Page Expired** error
+* Demonstrates CSRF attack prevention
+
+---
+
+### AJAX Form
+
+* Uses jQuery AJAX
+* CSRF token sent via request headers
+
+```
+X-CSRF-TOKEN: <token>
+```
+
+---
+
+## CSRF Protection in AJAX
+
+Laravel supports CSRF protection in AJAX requests using:
+
+* Meta tag token
+* X-CSRF-TOKEN header
+* Hidden form input
+
+The project demonstrates how to configure all methods correctly.
+
+---
+
+## Welcome Page
+
+The home page explains:
+
+* What CSRF is
+* How Laravel prevents CSRF attacks
+* Different ways to include CSRF tokens
+
+It links to:
+
+* Protected form
+* Unsafe form
+* AJAX form
+
+---
+
+## CSRF Middleware Configuration
+
+Located at:
+
+```
+app/Http/Middleware/VerifyCsrfToken.php
+```
+
+Key options:
+
+* Exclude specific URIs from CSRF protection
+* Configure token expiration
+* Enable or disable XSRF cookie
+
+---
+
+## Running the Application
+
+```bash
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
+
+Open in browser:
+
+```
+http://localhost:8000
+```
+
+---
+
+## Testing Scenarios
+
+* Protected form submits successfully
+* Unsafe form returns 419 error
+* AJAX form submits successfully
+* Validation errors handled correctly
+
+---
+
+## CSRF Concepts Demonstrated
+
+* Automatic token generation
+* Token verification on POST requests
+* Token mismatch handling
+* Session-based CSRF tokens
+* AJAX CSRF integration
+
+---
+
+## Security Best Practices
+
+* Always use HTTPS in production
+* Never expose CSRF tokens in URLs
+* Regenerate tokens after authentication
+* Avoid disabling CSRF globally
+* Use SameSite cookies (default in Laravel)
+
+---
+
+# Screenshot
+
+### * Dashboard 
+<img width="1784" height="971" alt="image" src="https://github.com/user-attachments/assets/f2ba32f7-b575-4f29-bcde-78369ef92886" />
+
+### * Protected Form
+<img width="1613" height="809" alt="image" src="https://github.com/user-attachments/assets/75912638-eeb0-4755-8529-05178ade1445" />
+
+### * Unsafe Form
+<img width="1673" height="923" alt="image" src="https://github.com/user-attachments/assets/84a04560-a5b9-48ed-8caf-c39eca81896a" />
+
+---
+
+## Final Note
+
+This project clearly demonstrates Laravel's built-in CSRF protection mechanisms and how to use them correctly in traditional forms and AJAX-based applications.
+
+It is ideal for learning, teaching, and security demonstrations in Laravel 12.
