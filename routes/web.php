@@ -40,3 +40,7 @@ Route::get('/submissions', [FormController::class, 'submissions'])
 // Delete Submission
 Route::delete('/submissions/{id}', [FormController::class, 'destroy'])
     ->name('submissions.destroy');
+
+// Refresh CSRF Token (AJAX)
+Route::get('/refresh-csrf-token', [FormController::class, 'refreshToken'])
+    ->name('csrf.refresh');    
