@@ -6,20 +6,59 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\FormSubmission;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 class FormController extends Controller
 {
     // Dashboard
+    // Dashboard
     public function dashboard()
     {
-        return view('dashboard', [
-            'total' => FormSubmission::count(),
-            'today' => FormSubmission::whereDate('created_at', today())->count(),
-            'month' => FormSubmission::whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count(),
-            'latest' => FormSubmission::latest()->first(),
-        ]);
+        // Dashboard Cards
+        $total = FormSubmission::count();
+
+        $today = FormSubmission::whereDate('created_at', today())->count();
+
+        $month = FormSubmission::whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->count();
+
+        $latest = FormSubmission::latest()->first();
+
+        // Submission Type Counts
+        $protectedCount = FormSubmission::where('submission_type', 'Protected')->count();
+
+        $unsafeCount = FormSubmission::where('submission_type', 'Unsafe')->count();
+
+        $ajaxCount = FormSubmission::where('submission_type', 'AJAX')->count();
+
+        // Last 7 Days Analytics
+        $labels = [];
+        $data = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+
+            $date = Carbon::now()->subDays($i);
+
+            $labels[] = $date->format('d M');
+
+            $data[] = FormSubmission::whereDate(
+                'created_at',
+                $date->format('Y-m-d')
+            )->count();
+        }
+
+        return view('dashboard', compact(
+            'total',
+            'today',
+            'month',
+            'latest',
+            'protectedCount',
+            'unsafeCount',
+            'ajaxCount',
+            'labels',
+            'data'
+        ));
     }
 
     // Protected Form
@@ -145,5 +184,17 @@ class FormController extends Controller
         $submission->delete();
 
         return back()->with('success', 'Submission Deleted Successfully.');
+    }
+
+    // Refresh CSRF Token
+    public function refreshToken()
+    {
+        Session::regenerateToken();
+
+        return response()->json([
+            'success' => true,
+            'token' => csrf_token(),
+            'message' => 'CSRF Token Refreshed Successfully!'
+        ]);
     }
 }
