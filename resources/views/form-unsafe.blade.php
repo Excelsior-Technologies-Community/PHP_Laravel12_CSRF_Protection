@@ -11,7 +11,7 @@
                     <p class="text-danger">
                         <strong>⚠️ This form is NOT protected by CSRF token</strong>
                     </p>
-                    <p>Try submitting this form - it will fail with a 419 error.</p>
+                   <p>This form does not use CSRF protection and can be submitted without a CSRF token.</p>
 
                     <form method="POST" action="{{ route('form.unsafe.submit') }}">
                         <!-- Notice: No @csrf directive here! -->
@@ -39,7 +39,7 @@
         &lt;input type="submit" value="Click to win a prize!"&gt;
     &lt;/form&gt;
                         </pre>
-                        <p>This would fail if CSRF protection was enabled.</p>
+                       <p>This request can succeed because CSRF protection is disabled for this route.</p>
                     </div>
                 </div>
             </div>
