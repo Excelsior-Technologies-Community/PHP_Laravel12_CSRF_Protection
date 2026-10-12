@@ -43,4 +43,40 @@ Route::delete('/submissions/{id}', [FormController::class, 'destroy'])
 
 // Refresh CSRF Token (AJAX)
 Route::get('/refresh-csrf-token', [FormController::class, 'refreshToken'])
-    ->name('csrf.refresh');    
+    ->name('csrf.refresh');
+
+// ⚔️ FEATURE 1: Attacker Simulator & Security Incidents
+Route::get('/attacker-simulator', [FormController::class, 'showAttackerSimulator'])
+    ->name('simulator.show');
+
+Route::post('/simulate-attack-unsafe', [FormController::class, 'simulateAttackUnsafe'])
+    ->name('simulator.attack.unsafe');
+
+Route::post('/simulate-attack-protected', [FormController::class, 'simulateAttackProtected'])
+    ->name('simulator.attack.protected');
+
+Route::get('/incidents', [FormController::class, 'incidentsIndex'])
+    ->name('incidents.index');
+
+Route::delete('/incidents/{id}', [FormController::class, 'destroyIncident'])
+    ->name('incidents.destroy');
+
+Route::post('/incidents/clear', [FormController::class, 'clearIncidents'])
+    ->name('incidents.clear');
+
+// ⏱️ FEATURE 2: Sensitive Form with One-Time Anti-Replay Token
+Route::get('/sensitive-action', [FormController::class, 'showSensitiveForm'])
+    ->name('sensitive.show');
+
+Route::post('/sensitive-action', [FormController::class, 'submitSensitiveForm'])
+    ->name('sensitive.submit');
+
+// 🛡️ FEATURE 3: Cookie SameSite Inspector, Security Headers Audit & Exporter
+Route::get('/security-audit', [FormController::class, 'securityAudit'])
+    ->name('security.audit');
+
+Route::get('/submissions/export/excel', [FormController::class, 'exportExcel'])
+    ->name('submissions.export.excel');
+
+Route::get('/submissions/export/pdf', [FormController::class, 'exportPdf'])
+    ->name('submissions.export.pdf');    
